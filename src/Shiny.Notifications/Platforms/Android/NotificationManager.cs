@@ -152,7 +152,12 @@ namespace Shiny.Notifications
             if (notification.Android.Vibrate)
                 builder.SetVibrate(new long[] {500, 500});
 
-            if (notification.Sound != null)
+            var notifyDefaults = 0;
+            if (notification.SoundType == SoundType.SystemDefault)
+            {
+                notifyDefaults |= NotificationCompat.DefaultSound;
+            }
+            else if (notification.SoundType == SoundType.Custom && notification.Sound != null)
             {
                 if (!notification.Sound.Contains("://"))
                     notification.Sound =
@@ -161,6 +166,9 @@ namespace Shiny.Notifications
                 var uri = Android.Net.Uri.Parse(notification.Sound);
                 builder.SetSound(uri);
             }
+            // else: no sound (or no custom sound specified)
+
+            builder.SetDefaults(notifyDefaults);
 
             if (this.newManager != null)
             {
